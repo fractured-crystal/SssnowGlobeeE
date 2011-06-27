@@ -56,6 +56,12 @@
 
 //<edit>
 #include "llviewermenu.h"
+#include "llfloaterexport.h"
+#include "llfloaterexploreanimations.h"
+#include "llfloateravatartextures.h"
+#include "llfloaterattachments.h"
+LLVOAvatar* find_avatar_from_object( LLViewerObject* object );
+LLVOAvatar* find_avatar_from_object( const LLUUID& object_id );
 //</edit>
 
 /**
@@ -326,7 +332,12 @@ BOOL LLFloaterAvatarList::postBuild()
 	childSetAction("next_in_list_btn", onClickNextInList, this);
 	childSetAction("prev_marked_btn", onClickPrevMarked, this);
 	childSetAction("next_marked_btn", onClickNextMarked, this);
-	
+	//<edit>
+	childSetAction("anims_btn", onClickAnim, this);
+	childSetAction("export_dude_btn", onClickExport, this);
+	childSetAction("debug_btn", onClickDebug, this);
+	childSetAction("follow_btn", onClickFollow, this);
+	//<edit>
 	childSetAction("get_key_btn", onClickGetKey, this);
 
 	childSetAction("freeze_btn", onClickFreeze, this);
@@ -1202,12 +1213,77 @@ void LLFloaterAvatarList::onClickGetKey(void *userdata)
 	if (NULL == item) return;
 
 	LLUUID agent_id = item->getUUID();
-
+	LLChat chat;
+	chat.mText = "Key: "+agent_id.asString();
 	char buffer[UUID_STR_LENGTH];		/*Flawfinder: ignore*/
 	agent_id.toString(buffer);
-
 	gViewerWindow->mWindow->copyTextToClipboard(utf8str_to_wstring(buffer));
+	chat.mSourceType = CHAT_SOURCE_SYSTEM;
+    LLFloaterChat::addChat(chat);
 }
+
+//<edit/>
+void LLFloaterAvatarList::onClickAnim(void *userdata)
+{
+	LLFloaterAvatarList *self = (LLFloaterAvatarList*)userdata;
+ 	LLScrollListItem *simms = self->mAvatarList->getFirstSelected();
+
+	 if (NULL == simms) return;
+
+ LLUUID agent_id = simms->getUUID();
+  if(simms)
+  {
+   new LLFloaterExploreAnimations(agent_id); //temporary
+  }
+  return;
+ }
+
+void LLFloaterAvatarList::onClickExport(void *userdata)
+{
+ LLFloaterAvatarList *self = (LLFloaterAvatarList*)userdata;
+  LLScrollListItem *item = self->mAvatarList->getFirstSelected();
+       if(!item) return;
+       LLViewerObject *obj=gObjectList.findObject(item->getUUID());
+       if(obj)
+        {
+   LLSelectMgr::getInstance()->selectObjectOnly(obj);
+   LLFloaterExport* floater = new LLFloaterExport();
+   floater->center();
+   LLSelectMgr::getInstance()->deselectAll();
+        }
+       return;
+}
+
+void LLFloaterAvatarList::onClickDebug(void *userdata)
+{
+ LLFloaterAvatarList *self = (LLFloaterAvatarList*)userdata;
+ 	LLScrollListItem *simms = self->mAvatarList->getFirstSelected();
+
+	 if (NULL == simms) return;
+
+ LLUUID agent_id = simms->getUUID();
+  if(simms)
+  {
+   LLFloaterAvatarTextures::show( simms->getUUID() );
+  }
+ return ;
+}
+
+
+void LLFloaterAvatarList::onClickFollow(void *userdata)
+	{
+ LLFloaterAvatarList *self = (LLFloaterAvatarList*)userdata;
+  LLScrollListItem *item = self->mAvatarList->getFirstSelected();
+       if(!item) return;
+       LLViewerObject *obj=gObjectList.findObject(item->getUUID());
+       if(obj)
+        {
+		gAgent.startFollowPilot(obj->getID());
+	}
+	return;
+}
+
+//<edit/>				
 //static
 void LLFloaterAvatarList::sendKeys()
 {

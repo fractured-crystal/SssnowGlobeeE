@@ -1203,11 +1203,11 @@ void LLAppViewer::flushVFSIO()
 	}
 }
 
-extern void cleanup_pose_stand(void);
+//extern void cleanup_pose_stand(void);
 
 bool LLAppViewer::cleanup()
 {
-	cleanup_pose_stand();
+	//cleanup_pose_stand();
 
 	//flag all elements as needing to be destroyed immediately
 	// to ensure shutdown order

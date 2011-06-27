@@ -247,6 +247,8 @@
 #include "llfloatervfs.h"
 #include "llfloatervfsexplorer.h"
 #include "lleventtimer.h"
+#include "llfloaterattachments.h"
+#include "llfloaterkeytool.h"
 // </edit>
 
 #include "scriptcounter.h"
@@ -434,16 +436,13 @@ void handle_interceptor(void*);
 
 // <dogmode> for pose stand
 LLUUID current_pose = LLUUID::null;
-bool on_pose_stand;
 
 void set_current_pose(std::string anim)
 {
-	if (!on_pose_stand)
-	{
-		on_pose_stand = true;
+	if (current_pose == LLUUID::null)
 		gSavedSettings.setF32("AscentAvatarZModifier", gSavedSettings.getF32("AscentAvatarZModifier") + 7.5);
-	}
 
+	gAgent.sendAgentSetAppearance();
 	gAgent.sendAnimationRequest(current_pose, ANIM_REQUEST_STOP);
 	current_pose.set(anim);
 	gAgent.sendAnimationRequest(current_pose, ANIM_REQUEST_START);
@@ -452,19 +451,43 @@ void handle_pose_stand(void*)
 {
 	set_current_pose("038fcec9-5ebd-8a8e-0e2e-6e71a0a1ac53");
 }
+void handle_undeform_avatar(void*)
+{
+	set_current_pose("44e98907-3764-119f-1c13-cba9945d2ff4");
+}
+void handle_pose_stand_ltao(void*)
+{
+	set_current_pose("6c082c7b-f70e-9da0-0451-54793f869ff4");
+}
+void handle_pose_stand_ltah(void*)
+{
+	set_current_pose("45e59c14-913b-c58c-2a55-c0a5c1eeef53");
+}
+void handle_pose_stand_ltad(void*)
+{
+	set_current_pose("421d6bb4-94a9-3c42-4593-f2bc1f6a26e6");
+}
+void handle_pose_stand_loau(void*)
+{
+	set_current_pose("8b3bb239-d610-1c0f-4d1a-69d29bc17e2c");
+}
+void handle_pose_stand_loao(void*)
+{
+	set_current_pose("4d70e328-48b6-dc6a-0be1-85dd6b333e81");
+}
+void handle_pose_stand_lhao(void*)
+{
+	set_current_pose("f088eaf0-f1c9-8cf1-99c8-09df96bb13ae");
+}
 void handle_pose_stand_stop(void*)
 {
-	if (on_pose_stand)
+	if (current_pose != LLUUID::null)
 	{
 		gSavedSettings.setF32("AscentAvatarZModifier", gSavedSettings.getF32("AscentAvatarZModifier") - 7.5);
-		on_pose_stand = false;
+		gAgent.sendAgentSetAppearance();
 		gAgent.sendAnimationRequest(current_pose, ANIM_REQUEST_STOP);
 		current_pose = LLUUID::null;
 	}
-}
-void cleanup_pose_stand(void)
-{
-	handle_pose_stand_stop(NULL);
 }
 
 void handle_toggle_pose(void* userdata) {
@@ -494,6 +517,7 @@ void handle_local_assets(void*);
 void handle_vfs_explorer(void*);
 void handle_sounds_explorer(void*);
 void handle_blacklist(void*);
+void handle_keytool_from_clipboard(void*);
 // </edit>
 
 BOOL is_inventory_visible( void* user_data );
@@ -806,20 +830,31 @@ void init_menus()
 	// TomY TODO convert these two
 	LLMenuGL*menu;
 
-	menu = new LLMenuGL("Party Hat");
+	menu = new LLMenuGL("Special");
+	menu->append(new LLMenuItemCallGL(  "Fake Away Status", &handle_fake_away_status, NULL));
 	menu->append(new LLMenuItemCallGL(	"Close All Dialogs", 
 										&handle_close_all_notifications, NULL, NULL, 'D', MASK_CONTROL | MASK_ALT | MASK_SHIFT));
+	menu->append(new LLMenuItemCallGL(  "Phantom Avatar", &handle_phantom_avatar, NULL));
+	menu->append(new LLMenuItemCallGL(  "Undeform Avatar", &handle_undeform_avatar, NULL));
+	menu->append(new LLMenuItemCallGL(  "Rainbow Tag", &handle_rainbow_tag, NULL,&check_rainbow_tag,NULL));
+	menu->append(new LLMenuItemCallGL(	"Interceptor",  
+										&handle_interceptor,  NULL, NULL, 'I', MASK_CONTROL | MASK_ALT | MASK_SHIFT));
+	menu->append(new LLMenuItemCheckGL("Double-Click Teleport", 
+	menu_toggle_control, NULL, menu_check_control, 
+		(void*)"DoubleClickTeleport"));
+	menu->append(new LLMenuItemCheckGL("Double-Click Auto-Pilot", 
+	menu_toggle_control, NULL, menu_check_control, 
+		(void*)"DoubleClickAutoPilot"));
+			LLMenuItemCheckGL* item;
+	item = new LLMenuItemCheckGL("Show Look At", menu_toggle_control, NULL, menu_check_control, (void*)"AscentShowLookAt");
+	menu->append(item);
+
+	//menu->append(new LLMenuItemToggleGL("Show Look At", &LLHUDEffectLookAt::sDebugLookAt));
 	menu->appendSeparator();
-	menu->append(new LLMenuItemCallGL(  "Fake Away Status", &handle_fake_away_status, NULL));
 	menu->append(new LLMenuItemCallGL(  "Force Ground Sit", &handle_force_ground_sit, NULL));
-	menu->append(new LLMenuItemCallGL(  "Phantom Avatar", &handle_phantom_avatar, NULL,&check_phantom_avatar,NULL));
-	menu->appendSeparator();
-	menu->append(new LLMenuItemCallGL(	"Interceptor",
-						&handle_interceptor, NULL, NULL, 'I', MASK_CONTROL | MASK_ALT | MASK_SHIFT));//kind-of-a big deal -TF2Scout
-	menu->appendSeparator();
-	menu->append(new LLMenuItemCallGL( "Animation Override...",
+	menu->append(new LLMenuItemCallGL( "Animation Overrider",
 									&handle_edit_ao, NULL));
-	menu->append(new LLMenuItemCheckGL( "Nimble",
+	menu->append(new LLMenuItemCheckGL( "Make Nimble",
 										&menu_toggle_control,
 										NULL,
 										&menu_check_control,
@@ -829,22 +864,9 @@ void init_menus()
 										NULL,
 										&menu_check_control,
 										(void*)"ReSit"));
-	menu->append(new LLMenuItemCallGL(  "Rainbow Tag", &handle_rainbow_tag, NULL,&check_rainbow_tag,NULL));
-	menu->appendSeparator();
-	menu->append(new LLMenuItemCallGL(	"Object Area Search", &handle_area_search, NULL));
-	menu->append(new LLMenuItemCallGL(  "Message Log", &handle_open_message_log, NULL));
-	menu->append(new LLMenuItemCallGL(	"Message Builder", &handle_open_message_builder, NULL));
-
-	menu->append(new LLMenuItemCallGL(	"Sound Explorer",
-											&handle_sounds_explorer, NULL));
-	menu->append(new LLMenuItemCallGL(	"Asset Blacklist",
-											&handle_blacklist, NULL));
-	
-	
-	
-	// <dogmode>
+		// <dogmode>
 	// Add in the pose stand -------------------------------------------
-	/*LLMenuGL* sub = new LLMenuGL("Pose Stand...");
+	LLMenuGL* sub = new LLMenuGL("Pose Stand...");
 	menu->appendMenu(sub);
 
 	sub->append(new LLMenuItemCallGL(  "Legs Together Arms Out", &handle_pose_stand_ltao, NULL));
@@ -855,9 +877,35 @@ void init_menus()
 	sub->append(new LLMenuItemCallGL(  "Legs Half Arms Out", &handle_pose_stand_lhao, NULL));
 	sub->append(new LLMenuItemCallGL(  "Stop Pose Stand", &handle_pose_stand_stop, NULL));
 	// </dogmode> ------------------------------------------------------*/
-	
-	menu->append(new LLMenuItemCheckGL("Pose Stand",&handle_toggle_pose, NULL, &handle_check_pose, NULL));
+	menu->appendSeparator();
+	menu->append(new LLMenuItemCallGL(  "Clipboard Keytool",
+		&handle_keytool_from_clipboard, NULL, NULL, 'K', MASK_CONTROL | MASK_SHIFT));
+	menu->append(new LLMenuItemCallGL(	"Local Assets...",
+												&handle_local_assets, NULL));
+	menu->appendSeparator();
+	menu->append(new LLMenuItemCallGL(	"VFS Explorer",
+												&handle_vfs_explorer, NULL));
+	menu->append(new LLMenuItemCallGL(	"Sound Explorer",
+											&handle_sounds_explorer, NULL));
+	menu->append(new LLMenuItemCallGL(  "Message Log", &handle_open_message_log, NULL));
+	menu->append(new LLMenuItemCallGL(	"Message Builder", &handle_open_message_builder, NULL));
+	menu->append(new LLMenuItemCallGL(	"Reopen with Hex Editor", 
+											&handle_reopen_with_hex_editor, NULL));
+	menu->appendSeparator();
+	menu->append(new LLMenuItemCallGL(	"Object Area Search", &handle_area_search, NULL));	
+	menu->append(new LLMenuItemCallGL(	"Asset Blacklist",
+											&handle_blacklist, NULL));
+	menu->appendSeparator();
+	menu->append(new LLMenuItemCheckGL("Local Godmode",
+										   &handle_toggle_hacked_godmode,
+										   NULL,
+										   &check_toggle_hacked_godmode,
+										   (void*)"HackedGodmode"));
+	menu->append(new LLMenuItemCallGL("Advanced Menu",
+										   &toggle_debug_menus, NULL));
+//menu->append(new LLMenuItemCheckGL("Advanced Menu", menu_toggle_control, NULL, menu_check_control, (void*)"DebugSelectMgr"));
 
+										  
 	//these should always be last in a sub menu
 	menu->createJumpKeys();
 	gMenuBarView->appendMenu( menu );
@@ -1037,7 +1085,9 @@ void init_client_menu(LLMenuGL* menu)
 
 // <dogmode> 
 #ifdef TOGGLE_HACKED_GODLIKE_VIEWER
-	if (!LLViewerLogin::getInstance()->isInProductionGrid())
+	// <edit>
+	//if (!LLViewerLogin::getInstance()->isInProductionGrid())
+	// </edit>
 	{
 		menu->append(new LLMenuItemCheckGL("Hacked Godmode",
 										   &handle_toggle_hacked_godmode,
@@ -2231,6 +2281,25 @@ class LLObjectEdit : public view_listener_t
 	}
 };
 
+class LLObjectUUID : public view_listener_t
+{
+    bool handleEvent(LLPointer<LLEvent> event, const LLSD& userdata)
+    {
+LLViewerObject* slct = LLSelectMgr::getInstance()->getSelection()->getFirstObject();
+if(!slct)return true;
+LLUUID key = slct->getID();
+        LLChat chat;
+chat.mText = "Key: "+key.asString();
+char buffer[UUID_STR_LENGTH]; /*Flawfinder: ignore*/
+key.toString(buffer);
+gViewerWindow->mWindow->copyTextToClipboard(utf8str_to_wstring(buffer));
+
+        chat.mSourceType = CHAT_SOURCE_SYSTEM;
+        LLFloaterChat::addChat(chat);
+        return true;
+    }
+}; 
+
 class LLObjectInspect : public view_listener_t
 {
 	bool handleEvent(LLPointer<LLEvent> event, const LLSD& userdata)
@@ -2273,6 +2342,102 @@ class LLObjectDerender : public view_listener_t
 		return true;
 	}
 };
+//<PARTICLE>
+class LLObjectParticle : public view_listener_t
+{
+    bool handleEvent(LLPointer<LLEvent> event, const LLSD& userdata)
+    {
+        for (LLObjectSelection::valid_iterator iter = LLSelectMgr::getInstance()->getSelection()->valid_begin();
+             iter != LLSelectMgr::getInstance()->getSelection()->valid_end(); iter++)
+        {
+            LLSelectNode* node = *iter;
+            if(node->getObject()->isParticleSource())
+            {
+                LLPartSysData thisPartSysData = node->getObject()->mPartSourcep->mPartSysData;
+
+                std::ostringstream script_stream;
+                std::string flags_st="( 0 ";
+                std::string pattern_st="";
+
+                if (thisPartSysData.mPartData.mFlags & LLPartData::LL_PART_INTERP_COLOR_MASK)
+                    flags_st.append("\n\t\t\t\t|PSYS_PART_INTERP_COLOR_MASK");
+                if (thisPartSysData.mPartData.mFlags & LLPartData::LL_PART_INTERP_SCALE_MASK)
+                    flags_st.append("\n\t\t\t\t|PSYS_PART_INTERP_SCALE_MASK");
+                if (thisPartSysData.mPartData.mFlags & LLPartData::LL_PART_BOUNCE_MASK)
+                    flags_st.append("\n\t\t\t\t|PSYS_PART_BOUNCE_MASK");
+                if (thisPartSysData.mPartData.mFlags & LLPartData::LL_PART_WIND_MASK)
+                    flags_st.append("\n\t\t\t\t|PSYS_PART_WIND_MASK\n");
+                if (thisPartSysData.mPartData.mFlags & LLPartData::LL_PART_FOLLOW_SRC_MASK)
+                    flags_st.append("\n\t\t\t\t|PSYS_PART_FOLLOW_SRC_MASK");
+                if (thisPartSysData.mPartData.mFlags & LLPartData::LL_PART_FOLLOW_VELOCITY_MASK)
+                    flags_st.append("\n\t\t\t\t|PSYS_PART_FOLLOW_VELOCITY_MASK");
+                if (thisPartSysData.mPartData.mFlags & LLPartData::LL_PART_TARGET_POS_MASK)
+                    flags_st.append("\n\t\t\t\t|PSYS_PART_TARGET_POS_MASK");
+                if (thisPartSysData.mPartData.mFlags & LLPartData::LL_PART_TARGET_LINEAR_MASK)
+                    flags_st.append("\n\t\t\t\t|PSYS_PART_TARGET_LINEAR_MASK");
+                if (thisPartSysData.mPartData.mFlags & LLPartData::LL_PART_EMISSIVE_MASK)
+                    flags_st.append("\n\t\t\t\t|PSYS_PART_EMISSIVE_MASK");
+
+                switch (thisPartSysData.mPattern)
+                {
+                    case 0x01:    pattern_st=" PSYS_SRC_PATTERN_DROP ";        break;
+                    case 0x02:    pattern_st=" PSYS_SRC_PATTERN_EXPLODE ";    break;
+                    case 0x04:    pattern_st=" PSYS_SRC_PATTERN_ANGLE ";        break;
+                    case 0x08:    pattern_st=" PSYS_SRC_PATTERN_ANGLE_CONE ";    break;
+                    case 0x10:    pattern_st=" PSYS_SRC_PATTERN_ANGLE_CONE_EMPTY ";    break;// ty erscal
+                    default:    pattern_st="0";                    break;
+                }
+
+                script_stream << "default\n";
+                script_stream << "{\n";
+                script_stream << "\tstate_entry()\n";
+                script_stream << "\t{\n";
+                script_stream << "\t\tllParticleSystem([\n";
+                script_stream << "\t\t\tPSYS_PART_FLAGS," << flags_st << " ), \n";
+                script_stream << "\t\t\tPSYS_SRC_PATTERN," << pattern_st  << ",\n";
+                script_stream << "\t\t\tPSYS_PART_START_ALPHA," << thisPartSysData.mPartData.mStartColor.mV[3] << ",\n";
+                script_stream << "\t\t\tPSYS_PART_END_ALPHA," << thisPartSysData.mPartData.mEndColor.mV[3] << ",\n";
+                script_stream << "\t\t\tPSYS_PART_START_COLOR,<"<<thisPartSysData.mPartData.mStartColor.mV[0] << ",";
+                script_stream << thisPartSysData.mPartData.mStartColor.mV[1] << ",";
+                script_stream << thisPartSysData.mPartData.mStartColor.mV[2] << "> ,\n";
+                script_stream << "\t\t\tPSYS_PART_END_COLOR,<"<<thisPartSysData.mPartData.mEndColor.mV[0] << ",";
+                script_stream << thisPartSysData.mPartData.mEndColor.mV[1] << ",";
+                script_stream << thisPartSysData.mPartData.mEndColor.mV[2] << "> ,\n";
+                script_stream << "\t\t\tPSYS_PART_START_SCALE,<" << thisPartSysData.mPartData.mStartScale.mV[0] << ",";
+                script_stream << thisPartSysData.mPartData.mStartScale.mV[1] << ",0>,\n";
+                script_stream << "\t\t\tPSYS_PART_END_SCALE,<" << thisPartSysData.mPartData.mEndScale.mV[0] << ",";
+                script_stream << thisPartSysData.mPartData.mEndScale.mV[1] << ",0>,\n";
+                script_stream << "\t\t\tPSYS_PART_MAX_AGE," << thisPartSysData.mPartData.mMaxAge << ",\n";
+                script_stream << "\t\t\tPSYS_SRC_MAX_AGE," <<  thisPartSysData.mMaxAge << ",\n";
+                script_stream << "\t\t\tPSYS_SRC_ACCEL,<"<<  thisPartSysData.mPartAccel.mV[0] << ",";
+                script_stream << thisPartSysData.mPartAccel.mV[1] << ",";
+                script_stream << thisPartSysData.mPartAccel.mV[2] << ">,\n";
+                script_stream << "\t\t\tPSYS_SRC_BURST_PART_COUNT," << (U32) thisPartSysData.mBurstPartCount << ",\n";
+                script_stream << "\t\t\tPSYS_SRC_BURST_RADIUS," << thisPartSysData.mBurstRadius << ",\n";
+                script_stream << "\t\t\tPSYS_SRC_BURST_RATE," << thisPartSysData.mBurstRate << ",\n";
+                script_stream << "\t\t\tPSYS_SRC_BURST_SPEED_MIN," << thisPartSysData.mBurstSpeedMin << ",\n";
+                script_stream << "\t\t\tPSYS_SRC_BURST_SPEED_MAX," << thisPartSysData.mBurstSpeedMax << ",\n";
+                script_stream << "\t\t\tPSYS_SRC_ANGLE_BEGIN," << thisPartSysData.mInnerAngle << ",\n";
+                script_stream << "\t\t\tPSYS_SRC_ANGLE_END," << thisPartSysData.mOuterAngle << ",\n";
+                script_stream << "\t\t\tPSYS_SRC_OMEGA,<" << thisPartSysData.mAngularVelocity.mV[0]<< ",";
+                script_stream << thisPartSysData.mAngularVelocity.mV[1] << ",";
+                script_stream << thisPartSysData.mAngularVelocity.mV[2] << ">,\n";
+                script_stream << "\t\t\tPSYS_SRC_TEXTURE, (key)\"" << node->getObject()->mPartSourcep->getImage()->getID()<< "\",\n";
+                script_stream << "\t\t\tPSYS_SRC_TARGET_KEY, (key)\"" << thisPartSysData.mTargetUUID << "\"\n";
+                script_stream << " \t\t]);\n";
+                script_stream << "\t}\n";
+                script_stream << "}\n";
+
+                LLChat chat("\nRipped particle script has been copied to your clipboard, you can now paste it in a new script\n");
+                LLFloaterChat::addChat(chat);
+
+                gViewerWindow->mWindow->copyTextToClipboard(utf8str_to_wstring(script_stream.str()));
+            }
+        }
+        return true;
+    }
+};
+//</PARTICLE> 
 
 
 //---------------------------------------------------------------------------
@@ -2641,7 +2806,7 @@ class LLPowerfulWizard : public view_listener_t
 			{
 				LLChat chat;
 				chat.mSourceType = CHAT_SOURCE_SYSTEM;
-				chat.mText = llformat("Can't do that, dave.");
+				chat.mText = llformat("Can't do that, fuckhead.");
 				LLFloaterChat::addChat(chat);
 				return false;
 			}
@@ -2649,7 +2814,7 @@ class LLPowerfulWizard : public view_listener_t
 			// Let the user know they are a rippling madman what is capable of everything
 			LLChat chat;
 			chat.mSourceType = CHAT_SOURCE_SYSTEM;
-			chat.mText = llformat("~*zort*~");
+			chat.mText = llformat("~*Lolwut?*~");
 
 			LLFloaterChat::addChat(chat);
 			/*
@@ -2679,7 +2844,7 @@ class LLKillEmAll : public view_listener_t
 			{
 				LLChat chat;
 				chat.mSourceType = CHAT_SOURCE_SYSTEM;
-				chat.mText = llformat("Can't do that, dave.");
+				chat.mText = llformat("Can't do that, you penis head.");
 				LLFloaterChat::addChat(chat);
 				return false;
 			}
@@ -2687,7 +2852,7 @@ class LLKillEmAll : public view_listener_t
 			// Let the user know they are a rippling madman what is capable of everything
 			LLChat chat;
 			chat.mSourceType = CHAT_SOURCE_SYSTEM;
-			chat.mText = llformat("Irrevocably destroying object. Hope you didn't need that.");
+			chat.mText = llformat("Objectdestroy Is in progress.");
 
 			LLFloaterChat::addChat(chat);
 			/*
@@ -3091,6 +3256,29 @@ class LLAvatarDebug : public view_listener_t
 	}
 };
 
+//<edit>
+class LLAvatarEnableAttachmentList : public view_listener_t
+{
+	bool handleEvent(LLPointer<LLEvent> event, const LLSD& userdata)
+	{
+		LLViewerObject* object = LLSelectMgr::getInstance()->getSelection()->getPrimaryObject();
+		bool new_value = (object != NULL);
+		gMenuHolder->findControl(userdata["control"].asString())->setValue(new_value);
+		return true;
+	}
+};
+
+class LLAvatarAttachmentList : public view_listener_t
+{
+	bool handleEvent(LLPointer<LLEvent> event, const LLSD& userdata)
+	{
+		LLFloaterAttachments* floater = new LLFloaterAttachments();
+		floater->center();
+		return true;
+	}
+};
+//</edit>
+
 bool callback_eject(const LLSD& notification, const LLSD& response)
 {
 	S32 option = LLNotification::getSelectedOption(notification, response);
@@ -3219,10 +3407,15 @@ class LLAvatarCopyUUID : public view_listener_t
 		if(!avatar) return true;
 		
 		LLUUID uuid = avatar->getID();
+		LLChat chat;
+		chat.mText = "uuid: "+uuid.asString();
 		char buffer[UUID_STR_LENGTH];		/*Flawfinder: ignore*/
 		uuid.toString(buffer);
 		gViewerWindow->mWindow->copyTextToClipboard(utf8str_to_wstring(buffer));
-		return true;
+		
+		chat.mSourceType = CHAT_SOURCE_SYSTEM;
+        LLFloaterChat::addChat(chat);
+		return true; 
 	}
 };
 
@@ -3237,6 +3430,7 @@ class LLAvatarClientUUID : public view_listener_t
 		LLColor4 color;
 		avatar->getClientInfo(clientID, color, false);
 		gViewerWindow->mWindow->copyTextToClipboard(utf8str_to_wstring(clientID));
+        LLFloaterChat::addChat(clientID);
 		return true;
 	}
 };
@@ -3699,11 +3893,34 @@ void process_grant_godlike_powers(LLMessageSystem* msg, void**)
 }
 
 // <edit>
+void handle_keytool_from_clipboard(void*)
+	{
+		std::string clipstr = utf8str_trim(wstring_to_utf8str(gClipboard.getPasteWString()));
+		LLUUID key = LLUUID(clipstr);
+		if(key.notNull())
+			 {
+				 LLFloaterKeyTool::show(key);
+				 }
+		}
+
 
 void handle_reopen_with_hex_editor(void*)
 {
-
+	LLFloater* top = gFloaterView->getFrontmost();
+	if (top)
+	{
+		LLUUID item_id = top->getItemID();
+		if(item_id.notNull())
+		{
+			LLInventoryItem* item = gInventory.getItem(item_id);
+			if(item)
+			{
+				DOFloaterHex::show(item_id);
+			}
+		}
+	}
 }
+
 
 void handle_open_message_log(void*)
 {
@@ -3728,12 +3945,12 @@ void handle_edit_ao(void*)
 
 void handle_local_assets(void*)
 {
-
+	LLFloaterVFS::show();
 }
 
 void handle_vfs_explorer(void*)
 {
-
+	LLFloaterVFSExplorer::show();
 }
 
 void handle_sounds_explorer(void*)
@@ -4029,7 +4246,6 @@ class LLEditEnableCustomizeAvatar : public view_listener_t
 		return true;
 	}
 };
-
 
 class LLEditEnableChangeDisplayname : public view_listener_t
 {
@@ -9813,7 +10029,7 @@ void initialize_menus()
 	addMenu(new LLSelfEnableRemoveAllAttachments(), "Self.EnableRemoveAllAttachments");
 
 	 // Avatar pie menu
-
+    addMenu(new LLObjectParticle(), "Object.Particle");
 
 	addMenu(new LLObjectMute(), "Avatar.Mute");
 	addMenu(new LLAvatarAddFriend(), "Avatar.AddFriend");
@@ -9824,6 +10040,7 @@ void initialize_menus()
 	addMenu(new LLAvatarEnableDebug(), "Avatar.EnableDebug");
 	addMenu(new LLAvatarInviteToGroup(), "Avatar.InviteToGroup");
 	addMenu(new LLAvatarGiveCard(), "Avatar.GiveCard");
+	addMenu(new LLAvatarAttachmentList(), "Avatar.AttachmentList");
 	addMenu(new LLAvatarEject(), "Avatar.Eject");
 	addMenu(new LLAvatarSendIM(), "Avatar.SendIM");
 	addMenu(new LLAvatarReportAbuse(), "Avatar.ReportAbuse");
@@ -9845,6 +10062,8 @@ void initialize_menus()
 	addMenu(new LLObjectReportAbuse(), "Object.ReportAbuse");
 	addMenu(new LLObjectReportAbuse(), "Object.ReportAbuse");
 	// <edit>
+	addMenu(new LLObjectSaveAs(), "Object.SaveAs");
+	addMenu(new LLObjectImport(), "Object.Import");
 	addMenu(new LLObjectMeasure(), "Object.Measure");
 	addMenu(new LLObjectData(), "Object.Data");
 	addMenu(new LLScriptCount(), "Object.ScriptCount");
@@ -9852,6 +10071,7 @@ void initialize_menus()
 	addMenu(new LLPowerfulWizard(), "Object.Explode");
 	addMenu(new LLCanIHasKillEmAll(), "Object.EnableDestroy");
 	addMenu(new LLOHGOD(), "Object.EnableExplode");
+	addMenu(new LLObjectUUID(), "Object.UUID");
 	// </edit>
 	addMenu(new LLObjectMute(), "Object.Mute");
 	addMenu(new LLObjectBuy(), "Object.Buy");
@@ -9859,11 +10079,6 @@ void initialize_menus()
 	addMenu(new LLObjectInspect(), "Object.Inspect");
 	// <dogmode> Visual mute, originally by Phox.
 	addMenu(new LLObjectDerender(), "Object.DERENDER");
-	// <edit>
-	addMenu(new LLObjectSaveAs(), "Object.SaveAs");
-	addMenu(new LLObjectImport(), "Object.Import");
-	// </edit>
-	
 
 	addMenu(new LLObjectEnableOpen(), "Object.EnableOpen");
 	addMenu(new LLObjectEnableTouch(), "Object.EnableTouch");
@@ -9877,6 +10092,7 @@ void initialize_menus()
 	// <edit>
 	addMenu(new LLObjectEnableSaveAs(), "Object.EnableSaveAs");
 	addMenu(new LLObjectEnableImport(), "Object.EnableImport");
+	addMenu(new LLObjectEnableSaveAs(), "Avatar.EnableAttachmentList");
 	// </edit>
 
 	/*addMenu(new LLObjectVisibleTouch(), "Object.VisibleTouch");

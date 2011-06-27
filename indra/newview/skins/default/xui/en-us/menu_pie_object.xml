@@ -44,7 +44,6 @@
 			<on_enable function="Object.EnableReturn" />
 		</menu_item_call>
 		<pie_menu label="More &gt;" name="Rate Menu">
-			<menu_item_separator />
 			<pie_menu label="Tools &gt;" name="Rate Menu">
 				<menu_item_call enabled="false" label="Destroy" mouse_opaque="true" name="Destroy">
 					<on_click function="Object.Destroy" />
@@ -69,20 +68,18 @@
 					<on_click function="Tools.SelectedScriptAction" userdata="reset" />
 					<on_enable function="EditableSelected" />
 				</menu_item_call>
-				<menu_item_call enabled="false" hidden="false" label="Save As..." mouse_opaque="true"
-							 name="Save As...">
-					<on_click function="Object.SaveAs" />
-					<on_enable function="Object.EnableSaveAs" />
-				</menu_item_call>
-				<menu_item_call enabled="false" hidden="false" label="Import..." mouse_opaque="true"
-								 name="Import...">
-					<on_click function="Object.Import" />
-					<on_enable function="Object.EnableImport" />
+      <menu_item_call bottom="-487" enabled="false" height="19" label="Delete Scripts"
+					left="0" mouse_opaque="true" name="Delete Scripts" width="250">
+          <on_click function="Tools.ScriptDelete" userdata="Delete" />
+          <on_enable function="EnableScriptDelete" />
 				</menu_item_call>		
 			</pie_menu>
 			<menu_item_call enabled="false" label="Mute" mouse_opaque="true" name="Object Mute">
 				<on_click function="Object.Mute" />
 				<on_enable function="Object.EnableMute" />
+      </menu_item_call>
+      <menu_item_call enabled="true" label="UUID" mouse_opaque="true" name="UUID">
+        <on_click function="Object.UUID" />
 			</menu_item_call>
 			<menu_item_call enabled="true" label="Inspect" mouse_opaque="true" name="Object Inspect">
 				<on_click function="Object.Inspect" />
@@ -91,11 +88,19 @@
 			<menu_item_call enabled="true" label="Derender" mouse_opaque="true" name="Derender">
 				<on_click function="Object.DERENDER" />
 			</menu_item_call>
-			<menu_item_call enabled="false" label="Report..." mouse_opaque="true"
-			     name="Report Abuse...">
-				<on_click function="Object.ReportAbuse" />
-				<on_enable function="Object.EnableReportAbuse" />
+			<menu_item_call enabled="false" hidden="false" label="Particle Rip" mouse_opaque="true"
+                             name="Particles">
+                <on_click function="Object.Particle" />
+           </menu_item_call>
+			<menu_item_call enabled="false" hidden="false" label="Export" mouse_opaque="true"
+							 name="Export">
+				<on_click function="Object.SaveAs" />
+				<on_enable function="Object.EnableSaveAs" />
 			</menu_item_call>
+			<menu_item_call enabled="false" hidden="false" label="Import" mouse_opaque="true"
+							 name="Forge">
+				<on_click function="Object.Import" />
+				<on_enable function="Object.EnableImport" />
 		</pie_menu>
 		<menu_item_call enabled="false" label="Buy..." mouse_opaque="true" name="Buy...">
 			<on_click function="Object.Buy" />

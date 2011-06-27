@@ -120,6 +120,23 @@ bool doToSelected(LLFolderView* folder, std::string action)
 	{	
 		LLInventoryClipboard::instance().reset();
 	}
+	// <edit>
+	if("save_as" == action)
+	{
+		LLInventoryBackup::save(folder);
+		return true;
+	}
+	/*else if("save_invcache" == action)
+	{
+		LLFilePicker& file_picker = LLFilePicker::instance();
+		if(file_picker.getSaveFile( LLFilePicker::FFSAVE_INVGZ ))
+		{
+			std::string file_name = file_picker.getFirstFile();
+			LLLocalInventory::saveInvCache(file_name, folder);
+		}
+		return true;
+	}*/
+	// </edit>
 
 	std::set<LLUUID> selected_items;
 	folder->getSelectionList(selected_items);

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <floater name="radar" title="Radar"
 	can_resize="true" can_minimize="true" can_close="true" can_drag_on_left="false"
-	rect_control="FloaterRadarRect" min_width="300"	min_height="300">
+	rect_control="FloaterRadarRect" min_width="320"	min_height="300">
 
 	<scroll_list name="avatar_list"
 		    left="10" right="-10" top="-20" bottom="140" can_resize="true"
@@ -55,6 +55,17 @@
 			       font="SansSerifSmall"
 			       follows="bottom|left"
 			       />
+      <button
+			       name="follow_btn"
+			       label="Follow AV"
+			       tool_tip="Follows Selected Avatar"
+			       left_delta="90"
+			       bottom_delta="0"
+			       width="80"
+			       height="20"
+			       font="SansSerifSmall"
+			       follows="bottom|left"
+			       />
 			<!-- upper middle row -->
 			<button
 			       name="im_btn"
@@ -88,7 +99,18 @@
 			       height="20"
 			       font="SansSerifSmall"
 			       follows="bottom|left"
-			       />			
+			       />
+      <button
+			       name="debug_btn"
+			       label="AV Textures"
+			       tool_tip="Opens the selected avatar's"
+			       left_delta="90"
+			       bottom_delta="0"
+			       width="80"
+			       height="20"
+			       font="SansSerifSmall"
+			       follows="bottom|left"
+			       />
 			<!-- lower middle row-->
 			<button
 			       name="mark_btn"
@@ -116,6 +138,17 @@
 			       name="next_marked_btn"
 			       label="Next Marked"
 			       tool_tip="Focus camera on next marked avatar"
+			       left_delta="90"
+			       bottom_delta="0"
+			       width="80"
+			       height="20"
+			       font="SansSerifSmall"
+			       follows="bottom|left"
+			       />
+      <button
+			       name="anims_btn"
+			       label="AV Anims"
+			       tool_tip="Rip the selected avatars animations"
 			       left_delta="90"
 			       bottom_delta="0"
 			       width="80"
@@ -157,7 +190,17 @@
 			       font="SansSerifSmall"
 			       follows="bottom|left"
 			       />
-
+      <button
+               name="export_dude_btn"
+               label="AV Export"
+               tool_tip="Export the selected avatar in list"
+               left_delta="90"
+               bottom_delta="0"
+               width="80"
+               height="20"
+               font="SansSerifSmall"
+               follows="bottom|left"
+			       />
 		</panel>
 
 		<panel border="true" bottom_delta="-150" follows="left|top|right|bottom" height="255"

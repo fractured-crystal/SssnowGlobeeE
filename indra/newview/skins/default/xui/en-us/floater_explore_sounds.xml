@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <floater can_close="true" can_drag_on_left="false" can_minimize="true"
-    can_resize="true" height="300" width="350" min_width="350" min_height="170"  
+    can_resize="true" height="300" width="400" min_width="400" min_height="250"  
     name="floater_explore_sounds" title="Sounds" rect_control="FloaterSoundsRect">
 	<text type="string" length="50" bg_visible="false" border_drop_shadow_visible="false" border_visible="false"
 		bottom="-32" drop_shadow_visible="true" enabled="true" follows="left|top"
@@ -28,21 +28,26 @@
 	     follows="left|top|bottom|right" left="10" multi_select="true" 
 	     name="sound_list" search_column="0" top="-60" right="-10">
 		<column width="20" tool_tip="Type" name="type" />
-		<column width="50" label="Time" name="playing" />
+		<column width="60" label="Time" name="playing" />
 		<column dynamicwidth="true" width="150" label="Owner" name="owner" />
-		<column width="80" label="Sound" name="sound" />
+		<column width="70" label="Sound" name="sound" />
 	</scroll_list>
 	
-	<button bottom="31" follows="bottom|left" height="20" label="Look At" name="look_at_btn"
-		left="10" width="95"/>
-	<button bottom_delta="0" follows="bottom|left" height="20" label="Play Locally" name="play_locally_btn"
-		left_delta="100" width="95"/>
-	<button bottom_delta="0" follows="bottom|left" height="20" label="Play In World" name="play_ambient_btn" 
-	     	left_delta="100" width="95"/>
+	<button bottom="31" follows="bottom|left" height="20" label="Play Local" name="play_locally_btn"
+		left="10" width="78"/>
+	<button bottom_delta="0" follows="bottom|left" height="20" label="Play World" name="play_in_world_btn"
+		left_delta="100" width="78"/>
+	<button bottom_delta="0" follows="bottom|left" height="20" label="Ambient" name="play_ambient_btn" 
+	     	left_delta="100" width="78"/>
+	<button bottom_delta="0" follows="bottom|left" height="20" label="Stop" name="stop_btn" 
+	     	left_delta="100" width="78"/>
 
-	<button bottom="6" follows="bottom|left" height="20" label="Stop" name="stop_btn"
-	     	left="10" width="95"/>
-    	<button bottom_delta="0" follows="bottom|left" height="20" label="Add To Blacklist" name="bl_btn" 
-	     	left_delta="100" width="195"/>
-
+	<button bottom="6" follows="bottom|left" height="20" label="Look At" name="look_at_btn"
+	     	left="10" width="78"/>
+    <button bottom_delta="0" follows="bottom|left" height="20" label="Blacklist" name="bl_btn" 
+	     	left_delta="100" width="78"/>
+	<button bottom_delta="0" follows="bottom|left" height="20" label="UUID" name="copy_uuid_btn" 
+	     	left_delta="100" width="78"/>
+	<button bottom_delta="0" follows="bottom|left" height="20" label="Open" name="open_btn" 
+	     	left_delta="100" width="78"/>
 </floater>

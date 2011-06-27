@@ -148,13 +148,31 @@
 	<menu bottom_delta="0" color="MenuDefaultBgColor" drop_shadow="true" height="175" left="0"
 	     mouse_opaque="false" name="Open With..." opaque="true" tear_off="false"
 	     width="125">
-		<menu_item_call bottom_delta="-18" height="18" label="Hex Editor" left="0" mouse_opaque="true"
+	<menu_item_call bottom_delta="-18" height="18" label="Copy Asset UUID" left="0"
+	     mouse_opaque="true" name="Copy Asset UUID" width="128">
+		<on_click filter="" function="Inventory.DoToSelected" userdata="copy_uuid" />
+	</menu_item_call>
+	<menu_item_call bottom_delta="-18" height="18" label="Rez in World" left="0" mouse_opaque="true"
+	 name="Rez" width="128">
+			<on_click filter="" function="Inventory.DoToSelected" userdata="rez" />
+		</menu_item_call>
+	<menu_item_separator />
+		<menu_item_call bottom_delta="-18" height="18" label="Edit With Hex Editor" left="0" mouse_opaque="true"
 	     name="Hex Open" width="128">
 			<on_click filter="" function="Inventory.DoToSelected" userdata="open hex" />
 		</menu_item_call>
-		<menu_item_call bottom_delta="-18" height="18" label="Text Editor" left="0" mouse_opaque="true"
+		<menu_item_call bottom_delta="-18" height="18" label="Edit With Text Editor" left="0" mouse_opaque="true"
 	     name="Open Text" width="128">
 			<on_click filter="" function="Inventory.DoToSelected" userdata="open text" />
+		</menu_item_call>
+	<menu_item_separator />
+<menu_item_call bottom_delta="-18" height="18" label="Save As" left="0" mouse_opaque="true"
+	 name="Save As..." width="128">
+		<on_click filter="" function="Inventory.DoToSelected" userdata="save_as" />
+	</menu_item_call>
+	<menu_item_call bottom_delta="-18" height="18" label="Save InvCache" left="0" mouse_opaque="true"
+	 name="Save InvCache..." width="128">
+		<on_click filter="" function="Inventory.DoToSelected" userdata="save_invcache" />	
 		</menu_item_call>
 		<menu_item_call bottom_delta="-18" height="18" label="ObjectRez" left="0" mouse_opaque="true"
 	 name="Rez" width="128">

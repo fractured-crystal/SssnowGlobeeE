@@ -523,6 +523,31 @@ void LLFloaterWorldMap::draw()
 // Internal utility functions
 //-------------------------------------------------------------------------
 
+/* <edit>
+class LLTrackRegionIDCallback : //public LLRegionHandleCallback
+//{
+public:
+	LLTrackRegionIDCallback() {}
+	virtual ~LLTrackRegionIDCallback() {}
+	virtual bool dataReady(const LLUUID& region_id, const U64& region_handle)
+	{
+		if(region_handle != 0)
+		{
+			LLVector3d pos_global = from_region_handle(region_handle);
+			pos_global += LLVector3d(128.0f, 128.0f, 0.0f);
+			gFloaterWorldMap->trackLocation(pos_global);
+		}
+
+		return false; // Still dunno what this bool is
+	}
+};
+
+void LLFloaterWorldMap::trackRegionID(const LLUUID region_id)
+{
+	LLLandmark::requestRegionHandle(gMessageSystem, gAgent.getRegionHost(),
+		region_id, new LLTrackRegionIDCallback());
+}
+*/// </edit>
 
 void LLFloaterWorldMap::trackAvatar( const LLUUID& avatar_id, const std::string& name )
 {

@@ -25,9 +25,21 @@
         <on_click function="File.UploadBulk" userdata="" />
     </menu_item_call>
 	<menu_item_call bottom="-86" enabled="true" height="19"
-				label="Import XML..." left="0" mouse_opaque="true"
-				name="Import XML" width="243">
+		label="Import XML..." left="0" mouse_opaque="true"
+		name="Import XML" width="243">
 		<on_click function="File.ImportXML" userdata="" />
+		<on_enable function ="File.EnableImportXML" userdata="" />
+	</menu_item_call>
+	<menu_item_call bottom="-384" enabled="true" height="19"
+		label="Import Wearable" left="0" mouse_opaque="true"
+		name="Import Wearable" width="243">
+		<on_click function="File.ImportWear" userdata="" />
+		<on_enable function ="File.EnableImportXML" userdata="" />
+	</menu_item_call>
+	<menu_item_call bottom="-384" enabled="true" height="19"
+		label="Import Gesture" left="0" mouse_opaque="true"
+		name="Import Gesture" width="243">
+		<on_click function="File.ImportGest" userdata="" />
 		<on_enable function ="File.EnableImportXML" userdata="" />
 	</menu_item_call>
     <menu_item_separator enabled="true" label="-----------" mouse_opaque="true" name="separator" />

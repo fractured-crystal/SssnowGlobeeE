@@ -51,7 +51,7 @@ Null Tag
       <check_box bottom_delta="-23" control_name="AscentShowSelfTag" enabled="true"
         follows="left|top" font="SansSerifSmall" height="16" initial_value="true"
         label="Display client tag to self" left_delta="-24"
-        tool_tip="Choose whether others see that you enjoy Singularity."
+        tool_tip="Choose whether others see client tag."
         mouse_opaque="true" name="show_self_tag_check" radio_style="false"
         width="400" />
       <check_box bottom_delta="-20" control_name="AscentShowSelfTagColor" enabled="true"
@@ -115,7 +115,7 @@ Color:
       <check_box bottom_delta="-20" control_name="AscentUpdateTagsOnLoad" enabled="true"
         follows="left|top" font="SansSerifSmall" height="16" initial_value="true"
         label="Automatically check website for updates to client definitions" left_delta="-230"
-        tool_tip="Enabling this will allow Singularity to download fresh definitions when needed."
+        tool_tip="Enabling this will allow You  to download fresh definitions when needed."
         mouse_opaque="true" name="update_tags_check" radio_style="false"
         width="400" />
       <button bottom_delta="0" control_name="ManualUpdate" name="update_clientdefs" follows="left|top" 

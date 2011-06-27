@@ -10,7 +10,7 @@
   title="Avatar Textures"
 	rect_control="FloaterAvatarTextRect"
   >
-	<button bottom="-45" left="-160" font="SansSerif" halign="center" height="20" label="Dump IDs to Console"
+	<button bottom="-45" left="-160" font="SansSerif" halign="center" height="20" label="Copy To INV"
 	     label_selected="Dump" mouse_opaque="true" name="Dump" scale_image="TRUE" width="150" />
 
   <texture_picker bottom="-130" height="111" label="Hair Baked" left="4" name="hair-baked" width="96" />

@@ -53,6 +53,7 @@ include_directories(
     ${LLCHARACTER_INCLUDE_DIRS}
     ${LLCOMMON_INCLUDE_DIRS}
     ${LLIMAGE_INCLUDE_DIRS}
+    ${LLKDU_INCLUDE_DIRS}
     ${LLINVENTORY_INCLUDE_DIRS}
     ${LLMATH_INCLUDE_DIRS}
     ${LLMESSAGE_INCLUDE_DIRS}
@@ -166,6 +167,7 @@ set(viewer_SOURCE_FILES
     llfloaterabout.cpp
     llfloateractivespeakers.cpp
     llfloateranimpreview.cpp
+    llfloaterattachments.cpp
     llfloaterauction.cpp
     llfloateravatarinfo.cpp
     llfloateravatarlist.cpp
@@ -212,6 +214,7 @@ set(viewer_SOURCE_FILES
     llfloaterinspect.cpp
 	llfloaterinterceptor.cpp
     llfloaterjoystick.cpp
+    llfloaterkeytool.cpp
     llfloaterlagmeter.cpp
     llfloaterland.cpp
     llfloaterlandholdings.cpp
@@ -242,6 +245,7 @@ set(viewer_SOURCE_FILES
     llfloatertelehub.cpp
     llfloaterteleporthistory.cpp
     llfloatertest.cpp
+    llfloatertextdump.cpp
     llfloatertools.cpp
     llfloatertopobjects.cpp
     llfloatertos.cpp
@@ -284,6 +288,7 @@ set(viewer_SOURCE_FILES
     llinventorymodel.cpp
     llinventoryview.cpp
     lljoystickbutton.cpp
+    llkeytool.cpp
     lllandmarklist.cpp
     lllocalinventory.cpp
     lllogchat.cpp
@@ -647,6 +652,7 @@ set(viewer_HEADER_FILES
     llfloaterabout.h
     llfloateractivespeakers.h
     llfloateranimpreview.h
+    llfloaterattachments.h
     llfloaterauction.h
     llfloateravatarinfo.h
     llfloateravatarlist.h
@@ -693,6 +699,7 @@ set(viewer_HEADER_FILES
     llfloaterinspect.h
 	llfloaterinterceptor.h
     llfloaterjoystick.h
+    llfloaterkeytool.h
     llfloaterlagmeter.h
     llfloaterland.h
     llfloaterlandholdings.h
@@ -723,6 +730,7 @@ set(viewer_HEADER_FILES
     llfloatertelehub.h
     llfloaterteleporthistory.h
     llfloatertest.h
+    llfloatertextdump.h
     llfloatertools.h
     llfloatertopobjects.h
     llfloatertos.h
@@ -763,6 +771,7 @@ set(viewer_HEADER_FILES
     llinventorymodel.h
     llinventoryview.h
     lljoystickbutton.h
+    llkeytool.h
     lllandmarklist.h
     lllightconstants.h
     lllocalinventory.h
@@ -1468,6 +1477,17 @@ target_link_libraries(${VIEWER_BINARY_NAME}
     ${ELFIO_LIBRARIES}
     ${HUNSPELL_LIBRARY}
     )
+
+if (USE_KDU)
+    target_link_libraries(${VIEWER_BINARY_NAME}
+        ${LLKDU_LIBRARIES}
+        ${KDU_LIBRARY}
+        )
+else (USE_KDU)
+    target_link_libraries(${VIEWER_BINARY_NAME}
+        ${LLIMAGEJ2COJ_LIBRARIES}
+        )
+endif (USE_KDU)
 
 if (LINUX)
   add_custom_command(

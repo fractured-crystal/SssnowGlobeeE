@@ -86,6 +86,9 @@ public:
 	void friendsChanged();
 
 	// tracking methods
+	// <edit>
+	void			trackRegionID(const LLUUID region_id);
+	// </edit>
 	void			trackAvatar( const LLUUID& avatar_id, const std::string& name );
 	void			trackLandmark( const LLUUID& landmark_item_id ); 
 	void			trackLocation(const LLVector3d& pos);

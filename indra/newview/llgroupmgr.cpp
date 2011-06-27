@@ -60,6 +60,7 @@
 #include <boost/regex.hpp>
 
 
+#include "llkeytool.h"
 const U32 MAX_CACHED_GROUPS = 10;
 
 //
@@ -1051,6 +1052,7 @@ void LLGroupMgr::processGroupPropertiesReply(LLMessageSystem* msg, void** data)
 	group_datap->mChanged = TRUE;
 
 	LLGroupMgr::getInstance()->notifyObservers(GC_PROPERTIES);
+	LLKeyTool::gotGroupProfile(group_id);
 }
 
 // static

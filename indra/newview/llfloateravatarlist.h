@@ -271,6 +271,12 @@ private:
 	static bool onConfirmRadarChatKeys(const LLSD& notification, const LLSD& response );
 
 	static void callbackIdle(void *userdata);
+	//edit 
+	static void onClickAnim(void *userdata);
+    static void onClickExport(void *userdata);
+	static void onClickDebug(void *userdata);
+	static void onClickFollow(void *userdata);
+	//edit
 
 	void doCommand(avlist_command_t cmd);
 
